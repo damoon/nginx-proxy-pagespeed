@@ -66,15 +66,11 @@ RUN cd /usr/src/nginx-${NGINX_VERSION} && ./configure \
 
 RUN cd /usr/src/${LIBRESSL_VERSION}/ && ./config && make && make install && ./after.sh && cd /usr/src/nginx-${NGINX_VERSION} && make && make install
 
+# add forego
+RUN wget -P /usr/local/bin https://godist.herokuapp.com/projects/ddollar/forego/releases/current/linux-amd64/forego
+RUN chmod u+x /usr/local/bin/forego
 
-#Add custom nginx.conf file
-RUN mkdir -p /etc/nginx/sites-enabled
-ADD default.conf /etc/nginx/sites-enabled/default.conf
-ADD nginx.conf /etc/nginx/nginx.conf
-ADD pagespeed.conf /etc/nginx/pagespeed.conf
-ADD pagespeed-extra.conf /etc/nginx/pagespeed-extra.conf
-ADD proxy_params /etc/nginx/proxy_params
-
+# add default ssl cert
 RUN mkdir -p /etc/nginx/ssl
 WORKDIR /etc/nginx/ssl
 # The cert and its key are published with the docker image,
@@ -85,16 +81,19 @@ RUN openssl req -new -batch -key server.key -out server.csr
 RUN openssl x509 -req -days 10000 -in server.csr -signkey server.key -out server.crt
 RUN openssl dhparam -out dhparam.pem 512
 
+# add nginx confif
+RUN mkdir -p /etc/nginx/sites-enabled
+ADD default.conf /etc/nginx/sites-enabled/default.conf
+ADD nginx.conf /etc/nginx/nginx.conf
+ADD pagespeed.conf /etc/nginx/pagespeed.conf
+ADD pagespeed-extra.conf /etc/nginx/pagespeed-extra.conf
+ADD proxy_params /etc/nginx/proxy_params
 
+# add dynamic rewrite
 RUN mkdir /app
 WORKDIR /app
 ADD ./app /app
-
-RUN wget -P /usr/local/bin https://godist.herokuapp.com/projects/ddollar/forego/releases/current/linux-amd64/forego
-RUN chmod u+x /usr/local/bin/forego
 RUN chmod u+x /app/init.sh
-
-ADD app/docker-gen docker-gen
 
 EXPOSE 80 443
 VOLUME /app /etc/nginx /var/log/nginx
