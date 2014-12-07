@@ -69,7 +69,7 @@ RUN cd /usr/src/${LIBRESSL_VERSION}/ && ./config && make && make install && ./af
 
 #Add custom nginx.conf file
 RUN mkdir -p /etc/nginx/sites-enabled
-ADD default.conf /etc/nginx/site-enabled/default.conf
+ADD default.conf /etc/nginx/sites-enabled/default.conf
 ADD nginx.conf /etc/nginx/nginx.conf
 ADD pagespeed.conf /etc/nginx/pagespeed.conf
 ADD pagespeed-extra.conf /etc/nginx/pagespeed-extra.conf
