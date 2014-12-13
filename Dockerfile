@@ -2,7 +2,7 @@ FROM ubuntu:14.04
 MAINTAINER Jason Wilder jwilder@litl.com
 
 # Install Nginx.
-RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -y upgrade && DEBIAN_FRONTEND=noninteractive apt-get install nano git build-essential cmake zlib1g-dev libpcre3 libpcre3-dev unzip wget -y && apt-get clean
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -y upgrade && DEBIAN_FRONTEND=noninteractive apt-get install build-essential cmake zlib1g-dev libpcre3 libpcre3-dev unzip curl -y && apt-get clean
 
 ENV NGINX_VERSION 1.7.8
 ENV LIBRESSL_VERSION libressl-2.1.1
@@ -11,16 +11,15 @@ ENV NPS_VERSION 1.9.32.2
 
 RUN mkdir -p ${MODULESDIR}
 
-RUN cd /usr/src/ && wget http://nginx.org/download/nginx-${NGINX_VERSION}.tar.gz && tar xf nginx-${NGINX_VERSION}.tar.gz && rm -f nginx-${NGINX_VERSION}.tar.gz
-RUN cd /usr/src/ && wget http://ftp.openbsd.org/pub/OpenBSD/LibreSSL/${LIBRESSL_VERSION}.tar.gz && tar xvzf ${LIBRESSL_VERSION}.tar.gz
-RUN cd ${MODULESDIR} && git clone https://github.com/openresty/headers-more-nginx-module.git
+RUN cd /usr/src/ && curl -O http://nginx.org/download/nginx-${NGINX_VERSION}.tar.gz && tar xf nginx-${NGINX_VERSION}.tar.gz && unlink nginx-${NGINX_VERSION}.tar.gz
+RUN cd /usr/src/ && curl -O http://ftp.openbsd.org/pub/OpenBSD/LibreSSL/${LIBRESSL_VERSION}.tar.gz && tar xf ${LIBRESSL_VERSION}.tar.gz && unlink ${LIBRESSL_VERSION}.tar.gz
+RUN cd ${MODULESDIR} && curl -L -O https://github.com/openresty/headers-more-nginx-module/archive/v0.25.tar.gz && tar xf v0.25.tar.gz && unlink v0.25.tar.gz && mv headers-mo* headers-more-nginx-module
 
-RUN apt-get update && apt-get install -y build-essential zlib1g-dev libpcre3 libpcre3-dev unzip
 RUN cd ${MODULESDIR} && \
-    wget --no-check-certificate https://github.com/pagespeed/ngx_pagespeed/archive/release-${NPS_VERSION}-beta.zip && \
+    curl -L -O https://github.com/pagespeed/ngx_pagespeed/archive/release-${NPS_VERSION}-beta.zip && \
     unzip release-${NPS_VERSION}-beta.zip && \
     cd ngx_pagespeed-release-${NPS_VERSION}-beta/ && \
-    wget --no-check-certificate https://dl.google.com/dl/page-speed/psol/${NPS_VERSION}.tar.gz && \
+    curl -O https://dl.google.com/dl/page-speed/psol/${NPS_VERSION}.tar.gz && \
     tar -xzvf ${NPS_VERSION}.tar.gz
 
 ADD libressl-config /usr/src/${LIBRESSL_VERSION}/config
@@ -65,7 +64,7 @@ RUN cd /usr/src/nginx-${NGINX_VERSION} && ./configure \
 RUN cd /usr/src/${LIBRESSL_VERSION}/ && ./config && make && make install && ./after.sh && cd /usr/src/nginx-${NGINX_VERSION} && make && make install
 
 # add forego
-RUN wget -P /usr/local/bin https://godist.herokuapp.com/projects/ddollar/forego/releases/current/linux-amd64/forego
+RUN cd /usr/local/bin && curl -O https://godist.herokuapp.com/projects/ddollar/forego/releases/current/linux-amd64/forego
 RUN chmod u+x /usr/local/bin/forego
 
 # add default ssl cert
