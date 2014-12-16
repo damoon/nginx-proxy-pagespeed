@@ -1,5 +1,5 @@
 FROM ubuntu:14.04
-MAINTAINER Jason Wilder jwilder@litl.com
+MAINTAINER David Sauer davedamoon@gmail.com
 
 # Install Nginx.
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -y upgrade && DEBIAN_FRONTEND=noninteractive apt-get install build-essential cmake zlib1g-dev libpcre3 libpcre3-dev unzip curl -y && apt-get clean
