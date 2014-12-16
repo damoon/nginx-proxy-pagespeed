@@ -18,6 +18,7 @@ RUN cd ${MODULESDIR} && curl -L -O https://github.com/openresty/headers-more-ngi
 RUN cd ${MODULESDIR} && \
     curl -L -O https://github.com/pagespeed/ngx_pagespeed/archive/release-${NPS_VERSION}-beta.zip && \
     unzip release-${NPS_VERSION}-beta.zip && \
+    unlink release-${NPS_VERSION}-beta.zip && \
     cd ngx_pagespeed-release-${NPS_VERSION}-beta/ && \
     curl -O https://dl.google.com/dl/page-speed/psol/${NPS_VERSION}.tar.gz && \
     tar -xzvf ${NPS_VERSION}.tar.gz
@@ -69,14 +70,7 @@ RUN chmod u+x /usr/local/bin/forego
 
 # add default ssl cert
 RUN mkdir -p /etc/nginx/ssl
-WORKDIR /etc/nginx/ssl
-# The cert and its key are published with the docker image,
-# so it is insecure anyway and can be of short length (faster build time).
-# Use your own cert (4096 bit) for production.
-RUN openssl genrsa  -out server.key 512
-RUN openssl req -new -batch -key server.key -out server.csr
-RUN openssl x509 -req -days 10000 -in server.csr -signkey server.key -out server.crt
-RUN openssl dhparam -out dhparam.pem 512
+COPY ssl/* /etc/nginx/ssl
 
 # add nginx confif
 RUN mkdir -p /etc/nginx/sites-enabled
