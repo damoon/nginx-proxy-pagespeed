@@ -1,4 +1,4 @@
-FROM ubuntu:14.04
+FROM ubuntu:latest
 MAINTAINER David Sauer davedamoon@gmail.com
 
 # Install Nginx.
@@ -69,8 +69,7 @@ RUN cd /usr/local/bin && curl -O https://godist.herokuapp.com/projects/ddollar/f
 RUN chmod u+x /usr/local/bin/forego
 
 # add default ssl cert
-RUN mkdir -p /etc/nginx/ssl
-COPY ssl/* /etc/nginx/ssl
+COPY ssl/ /etc/nginx/ssl/
 
 # add nginx confif
 RUN mkdir -p /etc/nginx/sites-enabled
