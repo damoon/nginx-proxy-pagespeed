@@ -1,8 +1,11 @@
 FROM ubuntu:latest
 MAINTAINER David Sauer davedamoon@gmail.com
 
-# Install Nginx.
-RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -y upgrade && DEBIAN_FRONTEND=noninteractive apt-get install build-essential cmake zlib1g-dev libpcre3 libpcre3-dev unzip curl -y && apt-get clean
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get -y upgrade && \
+    DEBIAN_FRONTEND=noninteractive apt-get install build-essential cmake zlib1g-dev libpcre3 libpcre3-dev unzip curl -y && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
 ENV NGINX_VERSION 1.7.8
 ENV LIBRESSL_VERSION libressl-2.1.1
